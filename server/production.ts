@@ -1,22 +1,11 @@
-import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
+import express from "express";
+import { createServer } from "http";
 
 const app = express();
 
-// CORS configuration for your frontend
+// CORS configuration
 app.use((req, res, next) => {
-  // Replace with your actual frontend URL once deployed
-  const allowedOrigins = [
-    'https://job-portal-application-ravi.vercel.app', // Your Vercel frontend URL
-    'http://localhost:3000', // Local development
-    'http://localhost:5000'  // Local development
-  ];
-  
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin as string)) {
-    res.header('Access-Control-Allow-Origin', origin);
-  }
-  
+  res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   res.header('Access-Control-Allow-Credentials', 'true');
@@ -31,57 +20,30 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Logging middleware
-app.use((req, res, next) => {
-  const start = Date.now();
-  const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
-
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
-  };
-
-  res.on("finish", () => {
-    const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
-      }
-
-      console.log(logLine);
-    }
-  });
-
-  next();
-});
-
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'Job Portal Backend is running' });
 });
 
-(async () => {
-  const server = await registerRoutes(app);
+// Basic API routes - add your actual routes here
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'Backend is working!' });
+});
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-    console.error(`Error ${status}: ${message}`);
-    res.status(status).json({ message });
-  });
+// Error handling
+app.use((err: any, req: any, res: any, next: any) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Something went wrong!' });
+});
 
-  // Railway automatically provides PORT environment variable
-  const port = parseInt(process.env.PORT || '3000', 10);
-  
-  server.listen(port, '0.0.0.0', () => {
-    console.log(`🚀 Job Portal Backend server running on port ${port}`);
-    console.log(`Health check: http://localhost:${port}/health`);
-  });
-})();
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({ message: 'Route not found' });
+});
+
+const server = createServer(app);
+const port = parseInt(process.env.PORT || '3000', 10);
+
+server.listen(port, '0.0.0.0', () => {
+  console.log(`🚀 Server running on port ${port}`);
+});
