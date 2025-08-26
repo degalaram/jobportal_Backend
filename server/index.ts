@@ -6,18 +6,7 @@ const app = express();
 
 // CORS configuration for Vercel frontend
 app.use((req, res, next) => {
-  const allowedOrigins = [
-    'https://jobbs-e71l.vercel.app',
-    'http://localhost:5000',
-    'http://localhost:3000',
-    'http://127.0.0.1:5000'
-  ];
-  
-  const origin = req.headers.origin;
-  if (origin && allowedOrigins.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
-  }
-  
+  res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   res.header('Access-Control-Allow-Credentials', 'true');
@@ -73,6 +62,26 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interf
+  // For Railway, we only need API endpoints, no frontend serving
+  // Frontend is deployed separately on Vercel
+  app.get('/', (req, res) => {
+    res.json({ 
+      message: 'JobPortal API Server Running!', 
+      status: 'healthy',
+      environment: process.env.NODE_ENV 
+    });
+  });
+
+  // ALWAYS serve the app on the port specified in the environment variable PORT
+  // Other ports are firewalled. Default to 5000 if not specified.
+  // this serves both the API and the client.
+  // It is the only port that is not firewalled.
+  const port = parseInt(process.env.PORT || '5000', 10);
+  server.listen({
+    port,
+    host: "0.0.0.0",
+    reusePort: true,
+  }, () => {
+    log(`serving on port ${port}`);
+  });
+})();
