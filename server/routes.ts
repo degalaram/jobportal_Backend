@@ -20,6 +20,23 @@ const __dirname = path.dirname(__filename);
 
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Root route - API info
+  app.get("/", (req, res) => {
+    res.json({
+      message: "JobPortal Backend API",
+      version: "1.0.0",
+      status: "running",
+      endpoints: {
+        auth: "/api/auth/*",
+        jobs: "/api/jobs",
+        courses: "/api/courses",
+        companies: "/api/companies",
+        applications: "/api/applications",
+        contact: "/api/contact"
+      }
+    });
+  });
+
   // Auth routes
   app.post("/api/auth/register", async (req, res) => {
     try {
@@ -639,7 +656,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.send(fullHTML);
     } catch (error) {
       console.error('Error serving presentation:', error);
-      res.status(500).json({ message: 'Error loading presentation' });
+      res.status(500).json({ message: 'Error serving presentation' });
     }
   });
 
