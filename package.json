@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "node dist/index.js",
-    "build": "esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
-    "db:push": "drizzle-kit push",
-    "postinstall": "npm run build"
+    "start": "node dist/server/index.js",
+    "build": "tsc",
+    "dev": "tsx server/index.ts",
+    "db:push": "drizzle-kit push"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.10.4",
@@ -34,7 +34,7 @@
     "@types/node": "20.16.11",
     "@types/ws": "^8.5.13",
     "drizzle-kit": "^0.30.4",
-    "esbuild": "^0.25.0",
+    "tsx": "^4.7.0",
     "typescript": "5.6.3"
   }
 }
