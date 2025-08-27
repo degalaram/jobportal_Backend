@@ -6,7 +6,7 @@ const app = express();
 
 // CORS configuration for Vercel frontend
 const allowedOrigins = [
-  'https://job-portal-application-ram.vercel.app/', // Replace with your actual Vercel domain
+  'https://job-portal-application-ram.vercel.app', // FIXED: Removed trailing slash
   'http://localhost:3000',
   'http://localhost:5173',
   'http://localhost:5000'
@@ -69,7 +69,7 @@ app.use((req, res, next) => {
     const message = err.message || "Internal Server Error";
 
     res.status(status).json({ message });
-    throw err;
+    console.error('Server Error:', err);
   });
 
   // Health check endpoint for Railway
@@ -80,6 +80,11 @@ app.use((req, res, next) => {
       timestamp: new Date().toISOString(),
       endpoints: ['/api/jobs', '/api/auth', '/api/courses', '/api/companies', '/health']
     });
+  });
+
+  // Health check endpoint
+  app.get('/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
   });
 
   // Railway uses PORT environment variable
