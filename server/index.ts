@@ -6,7 +6,8 @@ const app = express();
 
 // CORS configuration for Vercel frontend
 const allowedOrigins = [
-  'https://job-portal-application-ram.vercel.app', // FIXED: Removed trailing slash
+ 
+  'https://job-portal-application-ram.vercel.app/',
   'http://localhost:3000',
   'http://localhost:5173',
   'http://localhost:5000'
@@ -62,37 +63,42 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  const server = await registerRoutes(app);
+  try {
+    const server = await registerRoutes(app);
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-
-    res.status(status).json({ message });
-    console.error('Server Error:', err);
-  });
-
-  // Health check endpoint for Railway
-  app.get('/', (req, res) => {
-    res.json({ 
-      status: 'JobPortal Backend API is running',
-      version: '1.0.0',
-      timestamp: new Date().toISOString(),
-      endpoints: ['/api/jobs', '/api/auth', '/api/courses', '/api/companies', '/health']
+    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+      const status = err.status || err.statusCode || 500;
+      const message = err.message || "Internal Server Error";
+      
+      console.error('Server Error:', err);
+      res.status(status).json({ message });
     });
-  });
 
-  // Health check endpoint
-  app.get('/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
-  });
+    // Health check endpoint for Railway
+    app.get('/', (req, res) => {
+      res.json({ 
+        status: 'JobPortal Backend API is running',
+        version: '1.0.0',
+        timestamp: new Date().toISOString(),
+        endpoints: ['/api/jobs', '/api/auth', '/api/courses', '/api/companies', '/health']
+      });
+    });
 
-  // Railway uses PORT environment variable
-  const port = parseInt(process.env.PORT || '3000', 10);
-  
-  server.listen(port, '0.0.0.0', () => {
-    log(`🚀 JobPortal Backend API serving on port ${port}`);
-    log(`🌐 Health check: http://localhost:${port}/health`);
-    log(`🔗 API base: http://localhost:${port}/api`);
-  });
+    // Health check endpoint
+    app.get('/health', (req, res) => {
+      res.json({ status: 'ok', timestamp: new Date().toISOString() });
+    });
+
+    // Railway uses PORT environment variable
+    const port = parseInt(process.env.PORT || '3000', 10);
+    
+    server.listen(port, '0.0.0.0', () => {
+      log(`🚀 JobPortal Backend API serving on port ${port}`);
+      log(`🌐 Health check: http://localhost:${port}/health`);
+      log(`🔗 API base: http://localhost:${port}/api`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
 })();
