@@ -6,7 +6,7 @@ const app = express();
 
 // CORS configuration for Vercel frontend
 const allowedOrigins = [
-  'https://your-vercel-domain.vercel.app', // Replace with your actual Vercel domain
+  'https://job-portal-application-ram.vercel.app/', // Replace with your actual Vercel domain
   'http://localhost:3000',
   'http://localhost:5173',
   'http://localhost:5000'
