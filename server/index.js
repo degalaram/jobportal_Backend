@@ -1,4 +1,4 @@
-import express from "express";
+import express from 'express';
 
 const app = express();
 
@@ -18,7 +18,7 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-// Basic routes that your frontend needs
+// Root endpoint
 app.get('/', (req, res) => {
   res.json({ 
     status: 'JobPortal Backend is running!',
@@ -30,6 +30,7 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
+// API endpoints your frontend needs
 app.get('/api/jobs', (req, res) => {
   res.json([
     {
