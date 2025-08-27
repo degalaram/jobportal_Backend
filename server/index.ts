@@ -1,12 +1,12 @@
 import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
-import { log } from "./vite";
+import { registerRoutes } from "./routes.js";
+import { log } from "./vite.js";
 
 const app = express();
 
 // CORS configuration for Vercel frontend
 const allowedOrigins = [
-  'https://job-portal-application-ram.vercel.app/', // Replace with your actual Vercel domain
+  'https://your-vercel-domain.vercel.app', // Replace with your actual Vercel domain
   'http://localhost:3000',
   'http://localhost:5173',
   'http://localhost:5000'
