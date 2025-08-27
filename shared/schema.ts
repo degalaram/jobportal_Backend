@@ -31,15 +31,15 @@ export const jobs = pgTable("jobs", {
   requirements: text("requirements").notNull(),
   qualifications: text("qualifications").notNull(),
   skills: text("skills").notNull(),
-  experienceLevel: text("experience_level").notNull(), // 'fresher', 'experienced'
+  experienceLevel: text("experience_level").notNull(),
   experienceMin: integer("experience_min").default(0),
   experienceMax: integer("experience_max").default(0),
   location: text("location").notNull(),
-  jobType: text("job_type").notNull(), // 'full-time', 'part-time', 'internship'
+  jobType: text("job_type").notNull(),
   salary: text("salary"),
   applyUrl: text("apply_url"),
   closingDate: timestamp("closing_date").notNull(),
-  batchEligible: text("batch_eligible"), // '2024', '2023-2024', etc.
+  batchEligible: text("batch_eligible"),
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -50,8 +50,8 @@ export const courses = pgTable("courses", {
   description: text("description").notNull(),
   instructor: text("instructor"),
   duration: text("duration"),
-  level: text("level"), // 'beginner', 'intermediate', 'advanced'
-  category: text("category").notNull(), // 'programming', 'web-development', etc.
+  level: text("level"),
+  category: text("category").notNull(),
   imageUrl: text("image_url"),
   courseUrl: text("course_url"),
   price: text("price"),
@@ -62,7 +62,7 @@ export const applications = pgTable("applications", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull(),
   jobId: varchar("job_id").notNull(),
-  status: text("status").default("applied"), // 'applied', 'reviewing', 'shortlisted', 'rejected', 'selected'
+  status: text("status").default("applied"),
   appliedAt: timestamp("applied_at").defaultNow(),
 });
 
@@ -74,7 +74,6 @@ export const contacts = pgTable("contacts", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
@@ -110,7 +109,6 @@ export const loginSchema = z.object({
   password: z.string().min(6),
 });
 
-// Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Company = typeof companies.$inferSelect;
