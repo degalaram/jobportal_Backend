@@ -1,23 +1,11 @@
-import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes.js";
-import { log } from "./vite.js";
+import express from "express";
 
 const app = express();
 
-// CORS configuration for Vercel frontend
-const allowedOrigins = [
-  'https://job-portal-application-ram.vercel.app',
-  'http://localhost:3000',
-  'http://localhost:5173',
-  'http://localhost:5000'
-];
-
+// CORS for your frontend
 app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin as string)) {
-    res.header('Access-Control-Allow-Origin', origin);
-  }
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  res.header('Access-Control-Allow-Origin', 'https://job-portal-application-ram.vercel.app');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   res.header('Access-Control-Allow-Credentials', 'true');
   
@@ -29,40 +17,70 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 
-// Health check endpoint for Railway
+// Basic routes that your frontend needs
 app.get('/', (req, res) => {
   res.json({ 
-    status: 'JobPortal Backend API is running',
-    version: '1.0.0',
-    timestamp: new Date().toISOString(),
-    endpoints: ['/api/jobs', '/api/auth', '/api/courses', '/api/companies']
+    status: 'JobPortal Backend is running!',
+    timestamp: new Date().toISOString()
   });
 });
 
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({ status: 'ok' });
 });
 
-(async () => {
-  try {
-    const server = await registerRoutes(app);
+app.get('/api/jobs', (req, res) => {
+  res.json([
+    {
+      id: "1",
+      title: "Software Developer",
+      company: { name: "Accenture", location: "Bengaluru" },
+      description: "Join our team",
+      experienceLevel: "fresher",
+      location: "Bengaluru",
+      salary: "₹4-6 LPA"
+    }
+  ]);
+});
 
-    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-      console.error('Server Error:', err);
-      res.status(500).json({ message: "Internal Server Error" });
-    });
+app.get('/api/courses', (req, res) => {
+  res.json([
+    {
+      id: "1",
+      title: "Python Programming",
+      description: "Learn Python basics",
+      category: "programming",
+      price: "₹2,999"
+    }
+  ]);
+});
 
-    const port = parseInt(process.env.PORT || '3000', 10);
-    
-    server.listen(port, '0.0.0.0', () => {
-      log(`🚀 JobPortal Backend API serving on port ${port}`);
-      log(`🌐 Health: http://localhost:${port}/health`);
-      log(`🔗 API: http://localhost:${port}/api`);
-    });
-  } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
-  }
-})();
+app.get('/api/companies', (req, res) => {
+  res.json([
+    {
+      id: "1", 
+      name: "Accenture",
+      description: "Global IT services",
+      location: "Bengaluru"
+    }
+  ]);
+});
+
+app.post('/api/auth/login', (req, res) => {
+  res.json({ id: "1", email: "test@example.com", fullName: "Test User" });
+});
+
+app.post('/api/auth/register', (req, res) => {
+  res.json({ id: "1", email: req.body.email, fullName: req.body.fullName });
+});
+
+app.post('/api/contact', (req, res) => {
+  res.json({ message: "Contact form submitted successfully" });
+});
+
+const port = parseInt(process.env.PORT || '3000', 10);
+
+app.listen(port, '0.0.0.0', () => {
+  console.log(`🚀 Server running on port ${port}`);
+});
